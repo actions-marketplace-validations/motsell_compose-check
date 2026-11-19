@@ -1,0 +1,28 @@
+{
+  "name": "@motsell/compose-check",
+  "version": "0.1.0",
+  "description": "Offline Docker Compose migration readiness checklist for normalized JSON",
+  "type": "module",
+  "license": "MIT",
+  "author": "MOTSELL",
+  "homepage": "https://motsell.com/tools/motsell-compose-check.html",
+  "bin": {
+    "motsell-compose-check": "bin/compose-check.mjs"
+  },
+  "files": [
+    "bin/compose-check.mjs",
+    "lib/analyze.mjs",
+    "lib/messages.mjs",
+    "examples/compose.json"
+  ],
+  "keywords": ["docker-compose", "migration", "self-hosting", "preflight", "offline"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/compose-check.test.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
