@@ -44,6 +44,8 @@ Database/cache detection and port cues are conservative heuristics based on a fe
 
 Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start) and the [browser-based checklist](https://motsell.com/tools/motsell-compose-check.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The CLI works offline without either link.
 
+Moving a Next.js app from Vercel? [Plan a VPS migration](https://motsell.com/en/guides/vps-for-websites?utm_source=github&utm_medium=repository&utm_campaign=vercel_migration_20261120&utm_content=compose_readme_en), including managed services that a Compose checklist cannot account for automatically.
+
 ### Optional GitHub Action for a manual migration review
 
 In a manually started (`workflow_dispatch`) job on a standard Linux runner, after your trusted source checkout, add this step. Replace the placeholder with the full commit SHA of the reviewed Action release. The file must be a regular, workspace-relative normalized JSON file; symlinks, URL and parent-directory paths are not accepted.
@@ -79,6 +81,8 @@ docker compose config --format json | node bin/compose-check.mjs --json
 - Инструмент не запускает Docker или другие процессы, не читает `.env` и упомянутые в JSON файлы, не проверяет доступность портов, не изменяет файлы и не отправляет телеметрию. Базы и кеши определяются эвристически; результат нужно проверить вручную, в том числе реальным восстановлением резервной копии.
 
 GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
+
+Переезжаете с Vercel? [Гайд по переносу Next.js на VPS](https://motsell.com/ru/guides/vps-dlya-saita?utm_source=github&utm_medium=repository&utm_campaign=vercel_migration_20261120&utm_content=compose_readme_ru) дополнительно разбирает управляемые сервисы, которые Compose не переносит автоматически.
 
 ## License / Лицензия
 
