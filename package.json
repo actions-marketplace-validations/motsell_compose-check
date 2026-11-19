@@ -20,7 +20,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test test/compose-check.test.mjs"
+    "test": "node --test test/compose-check.test.mjs test/action.test.mjs"
   },
   "publishConfig": {
     "access": "public"

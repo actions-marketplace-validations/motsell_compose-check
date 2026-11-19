@@ -44,6 +44,19 @@ Database/cache detection and port cues are conservative heuristics based on a fe
 
 Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start) and the [browser-based checklist](https://motsell.com/tools/motsell-compose-check.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The CLI works offline without either link.
 
+### Optional GitHub Action for a manual migration review
+
+In a manually started (`workflow_dispatch`) job on a standard Linux runner, after your trusted source checkout, add this step. Replace the placeholder with the full commit SHA of the reviewed Action release. The file must be a regular, workspace-relative normalized JSON file; symlinks, URL and parent-directory paths are not accepted.
+
+```yaml
+- uses: motsell/compose-check@<reviewed-release-commit-sha>
+  with:
+    json_file: migration/compose.normalized.json
+    fail_on_important: 'false'
+```
+
+Use a non-secret fixture or prepare the file in a separate trusted step. Do not check resolved secrets into the repository, print normalized JSON, upload it as an artifact, or pass it through workflow inputs. Avoid running this job on untrusted PRs or concurrently modifying the workspace. Use read-only repository permissions and avoid persisting checkout credentials. The Action itself does not execute Docker, request a token, send files, install packages, or call remote services; it wraps the existing CLI and prints only its fixed checklist messages and counters. Important cues are advisory by default. Set `fail_on_important: 'true'` to opt into a nonzero result for important cues; invalid input and checker failures always fail. This is not a deploy gate or security certification.
+
 ## Русский
 
 Локальная предварительная проверка готовности **вашего** Docker Compose-проекта к переносу. Подсказки охватывают тома и резервные копии, публикацию портов, зависимости от файлов хоста, порядок запуска, архитектуру и внешние ресурсы. Это не валидатор спецификации Compose, не аудит безопасности и не средство миграции.
@@ -64,6 +77,8 @@ docker compose config --format json | node bin/compose-check.mjs --json
 - `--lang ru`: русский текст. `--json`: машиночитаемый отчёт со стабильными кодами, важностью (`important` / `review`) и порядковым номером сервиса (начиная с 1, `null` — замечание ко всему проекту). Имена сервисов, пути, значения секретов не печатаются.
 - Код выхода `0` — анализ завершён без важных подсказок; `review` при этом возможны. `1` — есть важные подсказки. `2` — некорректный ввод, аргументы или ошибка чтения. При `--json` ошибка возвращается в stderr. Нулевой код не гарантирует успешный перенос.
 - Инструмент не запускает Docker или другие процессы, не читает `.env` и упомянутые в JSON файлы, не проверяет доступность портов, не изменяет файлы и не отправляет телеметрию. Базы и кеши определяются эвристически; результат нужно проверить вручную, в том числе реальным восстановлением резервной копии.
+
+GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
 
 ## License / Лицензия
 

@@ -1,0 +1,17 @@
+name: 'MOTSELL Compose Migration Checklist'
+description: 'Review normalized Docker Compose JSON for migration dependencies without starting Docker.'
+author: 'MOTSELL'
+inputs:
+  json_file:
+    description: 'Explicit workspace-relative path to a trusted normalized Compose JSON file.'
+    required: true
+  fail_on_important:
+    description: 'Fail for important review cues only when explicitly set to true; invalid inputs always fail.'
+    required: false
+    default: 'false'
+runs:
+  using: 'node24'
+  main: 'action.mjs'
+branding:
+  icon: 'check-square'
+  color: 'blue'
