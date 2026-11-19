@@ -1,0 +1,18 @@
+{
+  "services": {
+    "db": {
+      "image": "postgres:17-alpine",
+      "volumes": [{ "type": "volume", "source": "pgdata", "target": "/var/lib/postgresql/data" }]
+    },
+    "app": {
+      "build": { "context": "./app" },
+      "depends_on": { "db": { "condition": "service_healthy" } }
+    },
+    "caddy": {
+      "image": "caddy:2-alpine",
+      "ports": [{ "host_ip": "127.0.0.1", "published": "80", "target": 80, "protocol": "tcp" }],
+      "volumes": [{ "type": "bind", "source": "./Caddyfile", "target": "/etc/caddy/Caddyfile", "read_only": true }]
+    }
+  },
+  "volumes": { "pgdata": {} }
+}
