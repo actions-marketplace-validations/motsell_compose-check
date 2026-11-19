@@ -1,0 +1,7 @@
+{
+  "services": {
+    "synthetic-database": {
+      "image": "postgres:17"
+    }
+  }
+}
