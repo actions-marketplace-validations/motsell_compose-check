@@ -42,7 +42,7 @@ The tool never starts Docker, runs shell commands, connects to a host, checks po
 
 Database/cache detection and port cues are conservative heuristics based on a few common names, images and port numbers. An apparent mount may not cover the real data directory; a published port is not a reachability test. Review the findings, verify application requirements, test restoration and inspect the target environment separately.
 
-Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start) and the [browser-based checklist](https://motsell.com/tools/motsell-compose-check.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The CLI works offline without either link.
+Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start) and the [browser-based checklist](https://motsell.com/tools/motsell-compose-check-en.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The CLI works offline without either link.
 
 Moving a Next.js app from Vercel? [Plan a VPS migration](https://motsell.com/en/guides/vps-for-websites?utm_source=github&utm_medium=repository&utm_campaign=vercel_migration_20261120&utm_content=compose_readme_en), including managed services that a Compose checklist cannot account for automatically.
 
