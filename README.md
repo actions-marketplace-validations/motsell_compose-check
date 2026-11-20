@@ -2,6 +2,8 @@
 
 A small, offline readiness checklist for planning the migration of **your own** Docker Compose project. It reads normalized JSON and reports review cues for persistent data, backup restoration, port mappings, host files, startup dependencies, deployment architecture and external resources. It is not a Compose validator, security scanner, backup utility or deployment tool.
 
+Try the browser version without installing Node.js: [English](https://motsell.com/tools/motsell-compose-check-en.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool) · [Русский](https://motsell.com/tools/motsell-compose-check.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The browser checker keeps the supplied JSON on your device. Do not share normalized JSON that contains secrets.
+
 ## English
 
 Requires a supported Node.js LTS release (22 or newer). No runtime dependencies. No daemons or credentials.
@@ -42,7 +44,7 @@ The tool never starts Docker, runs shell commands, connects to a host, checks po
 
 Database/cache detection and port cues are conservative heuristics based on a few common names, images and port numbers. An apparent mount may not cover the real data directory; a published port is not a reachability test. Review the findings, verify application requirements, test restoration and inspect the target environment separately.
 
-Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start) and the [browser-based checklist](https://motsell.com/tools/motsell-compose-check-en.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The CLI works offline without either link.
+Related documentation: [Docker Compose quick-start and tested starter](https://motsell.com/en/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme#docker-quick-start). The CLI works offline without this link.
 
 Moving a Next.js app from Vercel? [Plan a VPS migration](https://motsell.com/en/guides/vps-for-websites?utm_source=github&utm_medium=repository&utm_campaign=vercel_migration_20261120&utm_content=compose_readme_en), including managed services that a Compose checklist cannot account for automatically.
 
@@ -81,6 +83,8 @@ docker compose config --format json | node bin/compose-check.mjs --json
 - Инструмент не запускает Docker или другие процессы, не читает `.env` и упомянутые в JSON файлы, не проверяет доступность портов, не изменяет файлы и не отправляет телеметрию. Базы и кеши определяются эвристически; результат нужно проверить вручную, в том числе реальным восстановлением резервной копии.
 
 GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
+
+[Быстрый старт Docker Compose на VPS и проверенный комплект](https://motsell.com/ru/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme_ru#docker-quick-start).
 
 Переезжаете с Vercel? [Гайд по переносу Next.js на VPS](https://motsell.com/ru/guides/vps-dlya-saita?utm_source=github&utm_medium=repository&utm_campaign=vercel_migration_20261120&utm_content=compose_readme_ru) дополнительно разбирает управляемые сервисы, которые Compose не переносит автоматически.
 
