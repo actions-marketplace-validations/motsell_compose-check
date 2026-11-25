@@ -53,6 +53,8 @@ Each snapshot has the same 250,000-byte and 1–80-service limits; comparison al
 
 The comparison JSON has `schemaVersion: 1`, `mode: "compare"`, `status: "manual_review_required"`, source/destination service counts and `findings`. Each finding has a fixed `code`, `priority`, `scope`, source/destination ordinal (or `null`), and optional mount ordinals (`sourceItem`, `destinationItem`). Ordinals refer to the corresponding parsed snapshot, not a shared ID. The existing exit codes apply; errors identify the input side without printing its path or values. Even an empty findings list is not proof of restored data or a working deployment.
 
+In a [real Compose normalization test with the synthetic PostgreSQL/Caddy starter](https://github.com/motsell/motsell/blob/775d47cc600090454fe851023a94c78f0ace8026/notes/compose-project-name.md), 0.2.0 found three changed physical volume names and two changed network names when the same project moved to a differently named directory. Using the same explicit project name eliminated those name changes, while bind-mount and build-context differences remained. No containers were started or volumes created; this was a configuration comparison, not data recovery.
+
 The existing GitHub Action still analyzes one snapshot; comparison is available through the CLI.
 
 ### What it does not do
@@ -110,6 +112,8 @@ motsell-compose-check --file ./source.json --compare ./destination.json --lang r
 ```
 
 Проверка отмечает изменения физических имён томов и сетей, подключений, образов, платформ, портов и условий запуска. Отчёт содержит только коды и порядковые номера в соответствующем файле, не имена, пути и значения секретов. JSON-режим возвращает `mode: "compare"`, `status: "manual_review_required"`, счётчики и подсказки; коды выхода прежние. Совпадение конфигураций не означает, что данные перенесены или сервис работает.
+
+В [эксперименте с нормализацией тестового проекта PostgreSQL/Caddy](https://github.com/motsell/motsell/blob/775d47cc600090454fe851023a94c78f0ace8026/notes/compose-project-name.md) версия 0.2.0 обнаружила три изменившихся имени томов и два имени сетей после смены каталога. Явное одинаковое имя проекта устранило эти различия; изменения путей bind mount и build context остались. Контейнеры не запускались, данные не восстанавливали.
 
 GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Она, как и прежде, анализирует один JSON. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
 
