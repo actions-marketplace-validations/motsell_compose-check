@@ -8,13 +8,13 @@ Try the browser version without installing Node.js: [English](https://motsell.co
 
 Requires a supported Node.js LTS release (22 or newer). No runtime dependencies. No daemons or credentials.
 
-**Registry status:** comparison is available in this source checkout (`0.2.0`); the npm registry still serves `0.1.0` (single-snapshot mode) until the new package is published.
-
-Install with npm:
+For comparison mode, download the [0.2.0 release package](https://github.com/motsell/compose-check/releases/tag/v0.2.0) or install it directly:
 
 ```sh
-npm install -g @motsell/compose-check
+npm install -g https://github.com/motsell/compose-check/releases/download/v0.2.0/motsell-compose-check-0.2.0.tgz
 ```
+
+The npm registry still serves `0.1.0` (single-snapshot mode).
 
 Run from a source checkout without installing the package:
 
@@ -83,6 +83,8 @@ Use a non-secret fixture or prepare the file in a separate trusted step. Do not 
 Локальная предварительная проверка готовности **вашего** Docker Compose-проекта к переносу. Подсказки охватывают тома и резервные копии, публикацию портов, зависимости от файлов хоста, порядок запуска, архитектуру и внешние ресурсы. Это не валидатор спецификации Compose, не аудит безопасности и не средство миграции.
 
 Нужна поддерживаемая LTS-версия Node.js (22 или новее). Установки дополнительных зависимостей не требуется.
+
+Версия со сравнением конфигураций — [0.2.0 на GitHub](https://github.com/motsell/compose-check/releases/tag/v0.2.0). В реестре npm пока доступна версия 0.1.0, которая проверяет один файл.
 
 Из каталога локального релиза:
 
