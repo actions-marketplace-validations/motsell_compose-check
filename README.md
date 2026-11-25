@@ -8,6 +8,8 @@ Try the browser version without installing Node.js: [English](https://motsell.co
 
 Requires a supported Node.js LTS release (22 or newer). No runtime dependencies. No daemons or credentials.
 
+**Registry status:** comparison is available in this source checkout (`0.2.0`); the npm registry still serves `0.1.0` (single-snapshot mode) until the new package is published.
+
 Install with npm:
 
 ```sh
