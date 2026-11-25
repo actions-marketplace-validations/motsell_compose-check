@@ -1,6 +1,6 @@
 # MOTSELL Compose Check
 
-A small, offline readiness checklist for planning the migration of **your own** Docker Compose project. It reads normalized JSON and reports review cues for persistent data, backup restoration, port mappings, host files, startup dependencies, deployment architecture and external resources. It is not a Compose validator, security scanner, backup utility or deployment tool.
+A small, offline readiness checklist for migrating **your own** Docker Compose project. Analyze one normalized JSON snapshot, or compare source and destination snapshots before moving a service. It reports review cues for persistent data, physical volume names, host files, images, startup dependencies and external resources. It is not a Compose validator, security scanner, backup utility or deployment tool.
 
 Try the browser version without installing Node.js: [English](https://motsell.com/tools/motsell-compose-check-en.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool) · [Русский](https://motsell.com/tools/motsell-compose-check.html?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=browser_tool). The browser checker keeps the supplied JSON on your device. Do not share normalized JSON that contains secrets.
 
@@ -37,6 +37,21 @@ The `docker compose` command is run by you, not by this tool. Docker Compose may
 - `--json` emits a JSON report on stdout: `schemaVersion`, `services`, `possibleDatabases`, `publishedPortEntries`, and findings with stable `code`, `priority` and `service` fields. `service` is the 1-based ordinal in parsed service property order (as returned by JavaScript `Object.keys`; integer-like keys first), or `null` for project-wide cues. Direct names are not returned. Treat `important` and `review` as checklist priorities, not established vulnerabilities, failed backups, or confirmed exposure. For invalid input, stdout is empty; `--json` emits a fixed `{ "schemaVersion": 1, "error": "CODE" }` object on stderr.
 - `--lang ru` selects the Russian human-readable report; JSON codes remain language-independent. `--help` lists options.
 - Exit `0`: input analyzed with no `important` findings; `review` findings may remain. Exit `1`: one or more `important` findings. Exit `2`: invalid arguments, unreadable input, or invalid JSON/configuration. A zero exit code does not certify readiness.
+
+### Compare source and destination
+
+Export both projects with the same `docker compose config --format json` command and keep the exports private; remove sensitive values. Compare two ordinary local files:
+
+```sh
+motsell-compose-check --file ./source.json --compare ./destination.json
+motsell-compose-check --file ./source.json --compare ./destination.json --lang ru --json
+```
+
+Each snapshot has the same 250,000-byte and 1–80-service limits; comparison also bounds nesting, resource/mount counts and the number of review items. It compares normalized metadata such as physical volume/network names, changes to mount sources, image/platform, ports, service dependencies and health checks. It does not inspect the contents of volumes or secrets, or compare private environment values.
+
+The comparison JSON has `schemaVersion: 1`, `mode: "compare"`, `status: "manual_review_required"`, source/destination service counts and `findings`. Each finding has a fixed `code`, `priority`, `scope`, source/destination ordinal (or `null`), and optional mount ordinals (`sourceItem`, `destinationItem`). Ordinals refer to the corresponding parsed snapshot, not a shared ID. The existing exit codes apply; errors identify the input side without printing its path or values. Even an empty findings list is not proof of restored data or a working deployment.
+
+The existing GitHub Action still analyzes one snapshot; comparison is available through the CLI.
 
 ### What it does not do
 
@@ -82,7 +97,17 @@ docker compose config --format json | node bin/compose-check.mjs --json
 - Код выхода `0` — анализ завершён без важных подсказок; `review` при этом возможны. `1` — есть важные подсказки. `2` — некорректный ввод, аргументы или ошибка чтения. При `--json` ошибка возвращается в stderr. Нулевой код не гарантирует успешный перенос.
 - Инструмент не запускает Docker или другие процессы, не читает `.env` и упомянутые в JSON файлы, не проверяет доступность портов, не изменяет файлы и не отправляет телеметрию. Базы и кеши определяются эвристически; результат нужно проверить вручную, в том числе реальным восстановлением резервной копии.
 
-GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
+### Сравнение исходного и нового проекта
+
+Сохраните два приватных нормализованных JSON, полученных одной командой Compose. Удалите чувствительные значения. Затем сравните файлы:
+
+```sh
+motsell-compose-check --file ./source.json --compare ./destination.json --lang ru
+```
+
+Проверка отмечает изменения физических имён томов и сетей, подключений, образов, платформ, портов и условий запуска. Отчёт содержит только коды и порядковые номера в соответствующем файле, не имена, пути и значения секретов. JSON-режим возвращает `mode: "compare"`, `status: "manual_review_required"`, счётчики и подсказки; коды выхода прежние. Совпадение конфигураций не означает, что данные перенесены или сервис работает.
+
+GitHub Action — необязательная обёртка CLI для ручного запуска (`workflow_dispatch`) в доверенной рабочей среде. Она, как и прежде, анализирует один JSON. Передаётся только путь к уже подготовленному нормализованному JSON внутри workspace, не содержимое файла. Не публикуйте секреты в репозитории, логах или артефактах. По умолчанию важные подсказки не останавливают job; ошибка ввода или проверки всегда останавливает. Пример и настройки приведены в английском разделе выше.
 
 [Быстрый старт Docker Compose на VPS и проверенный комплект](https://motsell.com/ru/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme_main_quick_start_ru#docker-quick-start). [Посмотреть цены на VPS в Германии и Финляндии](https://motsell.com/ru/vps-docker?utm_source=github&utm_medium=repository&utm_campaign=compose_check_20261119&utm_content=readme_main_order_ru#order).
 
