@@ -3,15 +3,16 @@ import { constants } from 'node:fs';
 import { lstat, open } from 'node:fs/promises';
 import { analyze, InputError, MAX_INPUT_BYTES, parseCompose } from '../lib/analyze.mjs';
 import { errorMessage, render } from '../lib/messages.mjs';
+import { CompareError, compareComposeBytes, comparisonErrorMessage, comparisonText } from '../lib/compare.mjs';
 
-const usage = `Usage: motsell-compose-check [--file PATH] [--json] [--lang en|ru]\n\nRead UTF-8 normalized Docker Compose JSON from stdin, or an explicit regular file.\nExit codes: 0 = analyzed, no important review cues; 1 = important review cues;\n2 = invalid arguments, unreadable input or invalid JSON/configuration.\nReview findings may be present with exit 0.\n`;
+const usage = `Usage: motsell-compose-check [--file PATH] [--json] [--lang en|ru]\n       motsell-compose-check --file SOURCE --compare DESTINATION [--json] [--lang en|ru]\n\nRead UTF-8 normalized Docker Compose JSON from stdin, or an explicit regular file.\nCompare mode reads two explicit files; it never restores data.\nExit codes: 0 = analyzed, no important review cues; 1 = important review cues;\n2 = invalid arguments, unreadable input or invalid JSON/configuration.\nReview findings may be present with exit 0.\n`;
 
 function options(args, opts) {
   const seen = new Set();
   let invalid = false;
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
-    if (!['--file', '--json', '--lang', '--help', '-h'].includes(arg) || seen.has(arg)) {
+    if (!['--file', '--compare', '--json', '--lang', '--help', '-h'].includes(arg) || seen.has(arg)) {
       invalid = true;
       continue;
     }
@@ -19,6 +20,9 @@ function options(args, opts) {
     if (arg === '--file') {
       opts.file = args[++i];
       if (!opts.file) invalid = true;
+    } else if (arg === '--compare') {
+      opts.compare = args[++i];
+      if (!opts.compare || opts.compare.startsWith('--')) invalid = true;
     } else if (arg === '--lang') {
       const lang = args[++i];
       if (lang !== 'en' && lang !== 'ru') invalid = true;
@@ -26,7 +30,7 @@ function options(args, opts) {
     } else if (arg === '--json') opts.json = true;
     else opts.help = true;
   }
-  if (invalid) throw new InputError('INVALID_ARGS');
+  if (invalid || opts.compare !== undefined && opts.file === undefined) throw new InputError('INVALID_ARGS');
 }
 
 async function readStdin() {
@@ -78,15 +82,24 @@ async function main() {
       process.stdout.write(usage);
       return;
     }
-    const bytes = opts.file !== undefined ? await readFile(opts.file) : await readStdin();
-    const report = analyze(parseCompose(bytes));
-    process.stdout.write(opts.json ? JSON.stringify(report, null, 2) + '\n' : render(report, opts.lang));
+    let report;
+    if (opts.compare !== undefined) {
+      const readSnapshot = async (path, side) => {
+        try { return await readFile(path); }
+        catch (error) { throw new CompareError(side + '_' + (error instanceof InputError ? error.code : 'INPUT_READ_FAILED')); }
+      };
+      report = compareComposeBytes(await readSnapshot(opts.file, 'SOURCE'), await readSnapshot(opts.compare, 'DESTINATION'));
+    } else {
+      const bytes = opts.file !== undefined ? await readFile(opts.file) : await readStdin();
+      report = analyze(parseCompose(bytes));
+    }
+    process.stdout.write(opts.json ? JSON.stringify(report, null, 2) + '\n' : opts.compare !== undefined ? comparisonText(report, opts.lang) + '\n' : render(report, opts.lang));
     process.exitCode = report.findings.some(finding => finding.priority === 'important') ? 1 : 0;
   } catch (error) {
-    const code = error instanceof InputError ? error.code : 'INPUT_READ_FAILED';
+    const code = error instanceof InputError || error instanceof CompareError ? error.code : 'INPUT_READ_FAILED';
     process.stderr.write(opts.json
       ? JSON.stringify({ schemaVersion: 1, error: code }) + '\n'
-      : `${code}: ${errorMessage(code, opts.lang)}\n`);
+      : `${code}: ${error instanceof CompareError ? comparisonErrorMessage(code, opts.lang) : errorMessage(code, opts.lang)}\n`);
     process.exitCode = 2;
   }
 }
